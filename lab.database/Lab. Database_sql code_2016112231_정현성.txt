@@ -1,0 +1,93 @@
+1. 릴레이션 작성.
+
+2. create database dgu;
+(use dgu)
+
+3.
+create table student(id CHAR(8), name VARCHAR(20), semester INT, PRIMARY KEY(id));
+
+create table register(st_id CHAR(8), co_id CHAR(8), regtime DATETIME);
+
+create table course(id CHAR(8), name VARCHAR(40), unit INT, professor VARCHAR(20), PRIMARY KEY(id));
+
+4. insert into student values
+    -> ('20190101', '가나다', 3),
+    -> ('20190102', '나한가', 2),
+    -> ('20190103', '나두야', 2),
+    -> ('20200101', '가운데', 1),
+    -> ('20200102', '김한나', 1),
+    -> ('20200103', '유명한', 1);
+
+5. insert into course values('S01', '데이터베이스', 3, '최교수'),
+    -> ('S02', '국어', 2, '강교수'),
+    -> ('S03', '영어', 2, 'James'),
+    -> ('S04', '자바', 3, '최교수'),
+    -> ('S05', '수학', 2, '수학교수');
+
+6.  insert into register
+    -> (select st.id, co.id, now() from student st, course co where
+    -> st.name = '김한나' and co.name = '데이터베이스');
+
+7. select * from register;
++----------+-------+---------------------+
+| st_id    | co_id | regtime             |
++----------+-------+---------------------+
+| 20200102 | S01   | 2020-11-24 17:27:08 |
++----------+-------+---------------------+
+
+8. insert into register
+    -> (select st.id, co.id, now() from student st, course co where
+    -> st.name = '김한나' and (co.name = '국어' or co.name = '영어'));
+
+9. select * from register;
++----------+-------+---------------------+
+| st_id    | co_id | regtime             |
++----------+-------+---------------------+
+| 20200102 | S01   | 2020-11-24 17:27:08 |
+| 20200102 | S02   | 2020-11-24 17:47:37 |
+| 20200102 | S03   | 2020-11-24 17:47:37 |
++----------+-------+---------------------+
+
+10. insert into register values
+    -> ('20190101', 'S01', now()),
+    -> ('20190101', 'S03', now()),
+    -> ('20190101', 'S04', now()),
+    -> ('20190101', 'S05', now()),
+    -> ('20190102', 'S01', now()),
+    -> ('20190102', 'S02', now()),
+    -> ('20190102', 'S03', now()),
+    -> ('20190102', 'S04', now()),
+    -> ('20190102', 'S05', now()),
+    -> ('20190103', 'S01', now()),
+    -> ('20190103', 'S03', now()),
+    -> ('20190103', 'S04', now()),
+    -> ('20190103', 'S05', now()),
+    -> ('20200101', 'S01', now()),
+    -> ('20200101', 'S02', now()),
+    -> ('20200101', 'S04', now()),
+    -> ('20200103', 'S02', now()),
+    -> ('20200103', 'S03', now()),
+    -> ('20200103', 'S04', now());
+
+11. select co.name as 교과목, co.unit as 학점, co.professor as 교수
+    -> from student st, register re, course co
+    -> where st.name = '김한나' and st.id = re.st_id and co.id = re.co_id
+    -> order by co.name;
+
+12. select st.name as 이름, count(*) as 과목수, sum(co.unit) as 학점
+    -> from student st, register re, course co
+    -> where st.id = re.st_id and co.id = re.co_id
+    -> group by st.name;
+
+13. delete from register
+    -> where st_id = (select id from student where name = '김한나')
+    -> and co_id = (select id from course where name = '국어');
+
+14. update student set
+    -> semester = semester + 1
+    -> where id in (select distinct st_id from register);
+
+15. delete from course
+    -> where id in (select co_id from register
+    -> group by co_id having
+    -> count(*) < 5);
