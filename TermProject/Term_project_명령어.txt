@@ -1,0 +1,116 @@
+create database Term;
+use Term
+
+릴레이션 테이블 생성
+
+1. create table customer(name varchar(20) NOT NULL, id char(8) NOT NULL, address varchar(100) NOT NULL, gender varchar(4), phone_number varchar(20), grade int NOT NULL, PRIMARY KEY(id));
+
+2. create table seller(name varchar(20) NOT NULL, site_address varchar(100) NOT NULL, address varchar(100), number varchar(20) NOT NULL, PRIMARY KEY(name));
+
+3. create table company(name varchar(20) NOT NULL, site_address varchar(100) NOT NULL, adress varchar(100), number varchar(20) NOT NULL, PRIMARY KEY(name));
+
+4. create table courier(name varchar(20) NOT NULL, id char(8) NOT NULL, gender varchar(4) NOT NULL, phone_number varchar(20) NOT NULL, company varchar(20) NOT NULL, salary int NOT NULL, employment date NOT NULL, PRIMARY KEY(id));
+
+5. create table service(id char(8) NOT NULL, address varchar(100) NOT NULL);
+
+6. create table item(number char(8) NOT NULL, name varchar(20) NOT NULL, price int NOT NULL, weight float NOT NULL, PRIMARY KEY(number));
+
+7. create table delivery(number char(8) NOT NULL, se_name varchar(20) NOT NULL, cu_name varchar(20) NOT NULL, weight float NOT NULL, co_name varchar(20) NOT NULL, invoice int NOT NULL, count int NOT NULL, fare int NOT NULL, re_date datetime NOT NULL, de_date datetime NOT NULL, PRIMARY KEY(number));
+
+8. create table buy(number char(10) NOT NULL, buy_date datetime NOT NULL, cu_id char(8) NOT NULL, it_num char(8) NOT NULL, count int NOT NULL, PRIMARY KEY(number));
+
+9. create table sell(number char(10) NOT NULL, sell_date datetime NOT NULL, se_name varchar(20) NOT NULL, it_num char(8) NOT NULL, count int NOT NULL, PRIMARY KEY(number));
+
+데이터 입력
+
+10. insert into customer values
+    -> ('김고일', 'C001', '서울시 중구 필동', '남', '010-1111-1234', 1),
+    -> ('김고이', 'C002', '서울시 중구 광희동', '남', '010-2222-2222', 1),
+    -> ('이고삼', 'C003', '서울시 강동구 천호동', '여', '010-3333-1234', 3),
+    -> ('최고사', 'C004', '제주도 제주시', '여', '010-4444-4444', 4);
+
+11. insert into seller values
+    -> ('동국축산', 'dgu_animal.com', '강원도 횡성시', '033-111-1234'),
+    -> ('동국물산', 'dgu_anything.com', '경기도 일산시', '031-222-2222'),
+    -> ('동국패션', 'dgu_fashion.com', '서울시 동대문구', '02-3333-1234');
+
+12. insert into company values
+    -> ('동국택배', 'dgu_delivery.com', '서울시 중구 필동', '02-1111-8282'),
+    -> ('HJ택배', 'HJ_delivery.com', '서울시 중구 을지로', '02-2222-8282'),
+    -> ('CJ택배', 'CJ_delivery.com', '서울시 중구 서소문동', '02-3333-8282');
+
+13. insert into courier
+    -> (select '김택일', 'D001', '남', '010-9999-1234', co.name, 3000000, '2019-01-02' from company co
+    -> where co.name = '동국택배');
+insert into courier
+    -> (select '이택이', 'D002', '남', '010-8888-2222', co.name, 3500000, '2018-03-02' from company co
+    -> where co.name = 'HJ택배');
+insert into courier
+    -> (select '정택삼', 'D003', '남', '010-7777-1234', co.name, 4000000, '2016-05-20' from company co
+    -> where co.name = 'CJ택배');
+
+14. insert into service
+    -> (select cour.id, '서울시 중구' from courier cour
+    -> where cour.id = 'D001');
+insert into service
+    -> (select cour.id, '서울시 동대문구' from courier cour
+    -> where cour.id = 'D001');
+insert into service
+    -> (select cour.id, '서울시 강동구' from courier cour
+    -> where cour.id = 'D002');
+insert into service
+    -> (select cour.id, '제주도 제주시' from courier cour
+    -> where cour.id = 'D003');
+
+15. insert into item values
+    -> ('P001', '소고기', 50000, 1.2),
+    -> ('P002', '라면', 3000, 0.6),
+    -> ('P003', '과자', 4000, 0.1),
+    -> ('P004', '롱패딩', 300000, 1.5);
+
+16. insert into buy
+    -> (select 'B001', '2020-11-20 15:00:00', cu.id, it.number, 5 from customer cu, item it
+    -> where cu.id = 'C001' and it.number = 'P001');
+insert into buy
+    -> (select 'B002', '2020-11-22 15:00:00', cu.id, it.number, 5 from customer cu, item it
+    -> where cu.id = 'C002' and it.number = 'P002');
+insert into buy
+    -> (select 'B003', '2020-11-24 01:00:00', cu.id, it.number, 1 from customer cu, item it
+    -> where cu.id = 'C003' and it.number = 'P004');
+insert into buy
+    -> (select 'B004', '2020-11-25 18:00:00', cu.id, it.number, 1 from customer cu, item it
+    -> where cu.id = 'C004' and it.number = 'P004');
+
+17. insert into sell
+    -> (select 'S001', '2020-11-20 15:00:00', se.name, it.number, 5 from seller se, item it
+    -> where se.name = '동국축산' and it.number = 'P001');
+insert into sell
+    -> (select 'S002', '2020-11-22 15:00:00', se.name, it.number, 5 from seller se, item it
+    -> where se.name = '동국물산' and it.number = 'P002');
+insert into sell
+    -> (select 'S003', '2020-11-24 01:00:00', se.name, it.number, 1 from seller se, item it
+    -> where se.name = '동국패션' and it.number = 'P004');
+insert into sell
+    -> (select 'S004', '2020-11-25 18:00:00', se.name, it.number, 1 from seller se, item it
+    -> where se.name = '동국패션' and it.number = 'P004');
+
+18. insert into delivery
+    -> (select 'T001', se.name, cu.name, 6, co.name, 100001, 1, 3000, '2020-11-20 17:00:00', '2020-11-22 17:00:00' from seller se, customer cu, courier co
+    -> where se.name = '동국축산' and cu.name='김고일' and co.name='김택일');
+insert into delivery
+    -> (select 'T002', se.name, cu.name, 3, co.name, 100002, 1, 3000, '2020-11-22 17:00:00', '2020-11-24 17:00:00' from seller se, customer cu, courier co
+    -> where se.name = '동국물산' and cu.name='김고이' and co.name='김택일');
+insert into delivery
+    -> (select 'T003', se.name, cu.name, 1.5, co.name, 100003, 1, 2000, '2020-11-24 18:00:00', '2020-11-26 18:00:00' from seller se, customer cu, courier co
+    -> where se.name = '동국패션' and cu.name='이고삼' and co.name='이택이');
+insert into delivery
+    -> (select 'T004', se.name, cu.name, 1.5, co.name, 100004, 1, 10000, '2020-11-26 09:00:00', '2020-11-28 09:00:00' from seller se, customer cu, courier co
+    -> where se.name = '동국패션' and cu.name='최고사' and co.name='정택삼');
+
+
+
+
+
+
+
+
